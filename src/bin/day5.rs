@@ -1,7 +1,8 @@
 use aoc2022_rust::problem;
 use regex::Regex;
+use std::clone::Clone;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Stack<T> {
     stack: Vec<T>
 }
@@ -11,8 +12,8 @@ impl<T> Stack<T> {
         self.stack.pop()
     }
 
-    fn drain(&mut self, n: u32) -> std::vec::Drain<T> {
-        self.stack.drain((self.stack.len() - usize::try_from(n).unwrap())..)
+    fn pop_n(&mut self, n: u32) -> Vec<T> {
+        self.stack.drain((self.stack.len() - usize::try_from(n).unwrap())..).collect()
     }
 
     fn push(&mut self, item: T) {
@@ -24,7 +25,7 @@ impl<T> Stack<T> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Stacks {
     stacks: Vec<Stack<char>>
 }
@@ -46,7 +47,7 @@ impl Stacks {
     }
 
     fn move_2(&mut self, mov: Movement) {
-        let out = self.stacks[mov.from - 1].drain(mov.n);
+        let out: Vec<char> = self.stacks[mov.from - 1].pop_n(mov.n);
         for item in out {
             self.stacks[mov.to - 1].push(item);
         }
@@ -66,10 +67,11 @@ fn main() {
     let initial_9 = Stack{ stack: vec!['B', 'M', 'J', 'C', 'G', 'H', 'Z', 'W']};
     let initial = Stacks{ stacks: vec![initial_1, initial_2, initial_3, initial_4,
                                        initial_5, initial_6, initial_7, initial_8, initial_9]};
+    let initial2 = initial.clone();
     let solution_1 = solve1(initial, &input);
     println!("Puzzle 1 {}", solution_1);
-    // let solution_2 = solve2(&input);
-    // println!("Puzzle 2 {}", solution_2);
+    let solution_2 = solve2(initial2, &input);
+    println!("Puzzle 2 {}", solution_2);
 }
 
 struct Movement {
@@ -89,7 +91,6 @@ fn solve1(mut crates: Stacks, moves: &str) -> String {
 
     for single_move in parsed_moves {
         crates.move_crates(single_move);
-        println!("{:?}", crates);
     }
 
     return crates.tops()
@@ -106,7 +107,6 @@ fn solve2(mut crates: Stacks, moves: &str) -> String {
 
     for single_move in parsed_moves {
         crates.move_2(single_move);
-        println!("{:?}", crates);
     }
 
     return crates.tops()
@@ -123,9 +123,10 @@ mod tests {
         let initial_2 = Stack{ stack: vec!['M', 'C', 'D']};
         let initial_3 = Stack{ stack: vec!['P']};
         let initial = Stacks{ stacks: vec![initial_1, initial_2, initial_3]};
+        let initial2 = initial.clone();
         let solution_1 = solve1(initial, &input);
         assert_eq!(solution_1, "CMZ");
-        let solution_2 = solve2(&input);
+        let solution_2 = solve2(initial2, &input);
         assert_eq!(solution_2, "MCD");
     }
 }
