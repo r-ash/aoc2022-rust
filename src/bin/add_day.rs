@@ -22,7 +22,9 @@ fn main() {
 }
 
 fn get_solution_template(day_number: String) -> String {
-    format!("fn main() {{
+    format!("use aoc2022_rust::problem;
+
+fn main() {{
     let input = problem::load({day_number});
     let solution_1 = solve1(&input);
     println!(\"Puzzle 1 {{}}\", solution_1);
